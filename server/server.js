@@ -8,12 +8,14 @@ const connectDB = require('./config/db')
 // Connection to the database
 connectDB()
 
-// Static middleware for css rendering
+// Middlewares
 app.use(express.static('public'))
+app.use(express.json())
 
 // Template engine
 app.set('views', path.join(__dirname, '/views'))
-app.set('view engine', 'ejs')
+app.set('view engine', 'jsx')
+app.engine('jsx', require('express-react-views').createEngine());
 
 //Routes
 app.use('/api/files', require('./routes/files'))

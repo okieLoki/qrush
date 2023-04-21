@@ -3,6 +3,7 @@ const multer = require('multer')
 const path = require('path')
 const File = require('../models/file')
 const { v4: uuidv4 } = require('uuid');
+const { default: convertSize } = require("convert-size");
 require('dotenv').config()
 
 let storage = multer.diskStorage({
@@ -41,10 +42,52 @@ router.post('/', (req, res)=>{
             file: `${process.env.APP_BASE_URL}/files/${response.uuid}`
         })
     })
+})
 
+router.post('/send', async (req, res)=>{
+    const {uuid, emailTo, emailFrom} = req.body
     
+    //validate
+    if(!uuid || !emailTo || !emailFrom){
+        console.warn('uuid or email not found');
+        return res.status(422).send({
+            error : "All fields are required"
+        })
+    }
 
-    // response
+    //get data from database
+    const file = await File.findOne({uuid: uuid})
+
+    if(file.sender){
+        console.warn('Aleady sent');
+        return res.status(422).send({
+            error : "All fields are required"
+        })
+    }
+
+    file.sender = emailFrom
+    file.receiver = emailTo
+
+    const response = await file.save();
+
+    //Send email
+    const sendMail = require('../services/emailServices')
+    sendMail({
+        from: emailFrom,
+        to: emailTo,
+        subject: 'QRush File Sharing',
+        text: `${emailFrom} shared a file with you`,
+        html: require('../services/emailTemplate')({
+            emailFrom: emailFrom,
+            downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}`,
+            size: 1234,
+            expires: '5 Hours'
+        })
+    })
+
+    return res.send({
+        success: true
+    })
 })
 
 module.exports = router
