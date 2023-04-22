@@ -6,7 +6,7 @@ const bgProgress = document.querySelector(".bg-progress");
 const progressPercent = document.querySelector("#progressPercent");
 const progressContainer = document.querySelector(".progress-container");
 const progressBar = document.querySelector(".progress-bar");
-const status = document.querySelector(".status");
+const statusUpload = document.querySelector(".status");
 
 const sharingContainer = document.querySelector(".sharing-container");
 const copyURLBtn = document.querySelector("#copyURLBtn");
@@ -15,7 +15,7 @@ const emailForm = document.querySelector("#emailForm");
 
 const toast = document.querySelector(".toast");
 
-const baseURL = "https://qrush-backend.onrender.com/";
+const baseURL = "http://localhost:3000";
 const uploadURL = `${baseURL}/api/files`;
 const emailURL = `${baseURL}/api/files/send`;
 
@@ -28,7 +28,7 @@ browseBtn.addEventListener("click", () => {
 
 dropZone.addEventListener("drop", (e) => {
   e.preventDefault();
-  //   console.log("dropped", e.dataTransfer.files[0].name);
+  console.log("dropped", e.dataTransfer.files[0].name);
   const files = e.dataTransfer.files;
   if (files.length === 1) {
     if (files[0].size < maxAllowedSize) {
@@ -47,7 +47,7 @@ dropZone.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropZone.classList.add("dragged");
 
-  // console.log("dropping file");
+  console.log("dropping file");
 });
 
 dropZone.addEventListener("dragleave", (e) => {
@@ -69,7 +69,7 @@ fileInput.addEventListener("change", () => {
 // sharing container listenrs
 copyURLBtn.addEventListener("click", () => {
   fileURL.select();
-  document.execCommand("copy");
+  // document.execCommand("copy");
   showToast("Copied to clipboard");
 });
 
@@ -80,7 +80,7 @@ fileURL.addEventListener("click", () => {
 const uploadFile = () => {
   console.log("file added uploading");
 
-  files = fileInput.files;
+  const files = fileInput.files;
   const formData = new FormData();
   formData.append("myfile", files[0]);
 
@@ -117,9 +117,12 @@ const uploadFile = () => {
   xhr.send(formData);
 };
 
+
 const onFileUploadSuccess = (res) => {
   fileInput.value = ""; // reset the input
-  status.innerText = "Uploaded";
+  statusUpload.innerText = "Uploaded";
+
+
 
   // remove the disabled attribute from form btn & make text send
   emailForm[2].removeAttribute("disabled");
