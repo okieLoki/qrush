@@ -1,138 +1,92 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import './App.css';
+import React, { useRef, useState } from "react";
+import { FileDrop } from "react-file-drop";
+import axios from "axios";
+import Progress from "./components/Progress/Progress.jsx";
 
-const App = () => {
-  const [file, setFile] = useState(null);
-  const [link, setLink] = useState('');
-  const [qr, setQr] = useState('');
-  const [progress, setProgress] = useState(0);
-  const [senderEmail, setSenderEmail] = useState('');
-  const [receiverEmail, setReceiverEmail] = useState('');
+import "./app.scss";
 
-  const uploadNewFile = () => {
-    setFile(null);
-    setLink('');
-    setQr('');
-    setSenderEmail('');
-    setReceiverEmail('');
-  };
+export default function App() {
+  const inputRef = useRef();
+  const [filenames, setNames] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState(null);
+  const [fileLink, setFileLink] = useState(null);
 
-  const handleFileInputChange = (event) => {
-    setFile(event.target.files[0]);
-  };
+  const fileHandler = (files) => {
+    const extension = files[0].name.split(".")[1]?.toLowerCase();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    const formData = new FormData();
-    formData.append('myfile', file);
-
-    axios.post('http://localhost:3000/api/files', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setProgress(percentCompleted);
-        }
-      })
-      .then((response) => {
-        let downloadLink = response.data.file;
-        setLink(downloadLink);
-        let qrCodeUrl = `https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(downloadLink)}&chs=150x150`;
-        setQr(qrCodeUrl);
-      })
-      .catch((error) => {
-        console.error(error);
+    if (extension !== undefined) {
+      const fNames = Object.keys(files).map((name) => {
+        return {
+          name: files[name].name,
+          icon: files[name].name.split(".")[1]?.toUpperCase().trim()
+        };
       });
+      setNames((prev) => [...prev, fNames].flat());
+
+      // Create a new FormData object
+      const formData = new FormData();
+      formData.append("file", files[0]);
+
+      // Make an HTTP POST request to the backend API
+      axios
+        .post("https://qrush-backend.onrender.com/api/files/send", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            setUploadProgress(progress);
+          }
+        })
+        .then((response) => {
+          setFileLink(response.data.file);
+        })
+        .catch((error) => {
+          setUploadError(error.message);
+        });
+    } else {
+      alert("file type not supported");
+    }
   };
 
-  const handleSend = (event) => {
-    event.preventDefault();
-  
-    const uuid = link.split('/').pop();
-    const data = {
-      uuid,
-      emailFrom: senderEmail,
-      emailTo: receiverEmail
-    };
-  
-    axios
-      .post(`http://localhost:3000/api/files/send`, data)
-      .then((response) => {
-        console.log(response.data);
-        if (response.data.success) {
-          window.alert("Email sent successfully!");
-          setSenderEmail('')
-          setReceiverEmail('')
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const filePicker = () => {
+    inputRef.current.click();
   };
 
   return (
     <div className="container">
-      {(!link && !qr) && (
-        <div className="upload-area">
-          <form onSubmit={handleSubmit}>
-            <div className="file-drop-zone">
-              <label htmlFor="file-input">
-                <span className="file-label">Drag and drop your file here or </span>
-                <span className="file-upload-button">choose a file</span>
-              </label>
-              <input id="file-input" type="file" onChange={handleFileInputChange} />
-            </div>
-            <button type="submit" className="upload-button">
-              Upload
-            </button>
-          </form>
-          {progress > 0 && (
-            <div className="progress-bar-container">
-              <div className="progress-bar" style={{ width: `${progress}%` }}></div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {(link && qr) && (
-        <div className="file-details">
-          <h4>
-            <a href={link} target="_blank" rel="noopener noreferrer">
-              {link}
-            </a>
-          </h4>
-          <img src={qr} alt="QR code" className="qr-code" />
-          <form onSubmit={handleSend}>
-            <div className="form-group">
-              <label htmlFor="sender-email">Sender's Email:</label>
-              <input
-                id="sender-email"
-                type="email"
-                value={senderEmail}
-                onChange={(e) => setSenderEmail(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="receiver-email">Receiver's Email:</label>
-              <input
-                id="receiver-email"
-                type="email"
-                value={receiverEmail}
-                onChange={(e) => setReceiverEmail(e.target.value)}
-              />
-            </div>
-            <button type="submit">Send</button>
-          </form>
-          <button className="upload-new-file-button" onClick={uploadNewFile}>
-            Upload New File
-          </button>
-        </div>
-      )}
+      <h3>UPLOAD FILE</h3>
+      <div className="progressContainer">
+        {filenames &&
+          filenames.map((file, i) => (
+            <Progress key={i} name={file.name} icon={file.icon} />
+          ))}
+        {uploadProgress > 0 && (
+          <Progress key="progress" name="Uploading..." progress={uploadProgress} />
+        )}
+        {uploadError && (
+          <Progress key="error" name="Upload Error" progress={100} error={uploadError} />
+        )}
+        {fileLink && (
+          <Progress key="link" name="File Link" progress={100} link={fileLink} />
+        )}
+      </div>
+      <FileDrop onTargetClick={filePicker} onDrop={(f) => fileHandler(f)}>
+        <p className="placeholder">
+          DRAG FILE HERE <br /> OR <span>BROWSE</span>
+        </p>
+        <input
+          value=""
+          style={{ visibility: "hidden", opacity: 0 }}
+          ref={inputRef}
+          multiple="multiple"
+          type="file"
+          onChange={(e) => fileHandler(e.target.files)}
+        />
+      </FileDrop>
     </div>
   );
-};
-
-export default App;
+}
