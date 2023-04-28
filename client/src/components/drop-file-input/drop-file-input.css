@@ -3,11 +3,32 @@
     align-items: center;
     justify-content: center;
 }
+::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollable-div {
+    width: 280px;
+    border: 1px solid #2bbbfa;
+    background-color: #e3f7ff;
+    overflow-x: scroll;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: #888888 #f1f1f1;
+}
+
+.scrollable-div::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.scrollable-div::-webkit-scrollbar-thumb {
+    background-color: #888888;
+    border-radius: 5px;
+}
 
 .drop-file-input {
-    position: relative;
     width: 400px;
-    height: 200px;
+    height: 300px;
     border: 2px dashed var(--border-color);
     border-radius: 20px;
 
@@ -27,6 +48,7 @@
     height: 100%;
     cursor: pointer;
 }
+
 
 .drop-file-input:hover,
 .drop-file-input.dragover {
