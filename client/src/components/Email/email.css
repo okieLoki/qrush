@@ -1,0 +1,17 @@
+.css-input {
+    margin: 5px;
+    padding: 7px;
+    font-size: 16px;
+    border-width: 1px;
+    border-color: #CCCCCC;
+    background-color: #FFFFFF;
+    color: #000000;
+    border-style: solid;
+    border-radius: 8px;
+}
+input::placeholder {
+    color: lightgray;
+  }
+.css-input:focus {
+    outline:none;
+}

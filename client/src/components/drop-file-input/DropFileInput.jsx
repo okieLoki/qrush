@@ -6,11 +6,13 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RxCross2 } from "react-icons/rx";
 import Loading from "../../assets/loading.gif";
+import Email from '../Email/Email'
 
 import "./drop-file-input.css";
 
 import { ImageConfig } from "../../config/ImageConfig";
 import uploadImg from "../../assets/cloud-upload-regular-240.png";
+// import uploadImg from '../../assets/dribbble_1.gif'
 
 const DropFileInput = (props) => {
   const wrapperRef = useRef(null);
@@ -60,7 +62,7 @@ const DropFileInput = (props) => {
 
   const onFileSubmit = () => {
     setshowLoading(true);
-    setsubmitButtontext("Uploading");
+    setsubmitButtontext("Uploading  ");
     const formData = new FormData();
     formData.append("myfile", file);
     axios
@@ -92,10 +94,10 @@ const DropFileInput = (props) => {
   };
 
   return (
-    <>
+    <div className="upload">
       {!showLink && (
         <>
-          <h2 className="header">Upload your file here </h2>
+          <h2 className="header-heading">Upload your file here </h2>
           <div
             ref={wrapperRef}
             className="drop-file-input"
@@ -132,9 +134,8 @@ const DropFileInput = (props) => {
             <button className="btn-blue" onClick={onFileSubmit}>
               <div>
                 {submitButtontext}
-                <img src={Loading} style={{ width: 19 }} />
                 {showLoading ? (
-                  <img src={Loading} style={{ width: 30 }} className="load"/>
+                  <img src={Loading} style={{ width: 19 }} className="load"/>
                 ) : (
                   <></>
                 )}
@@ -152,15 +153,15 @@ const DropFileInput = (props) => {
           <div className="drop-file-link">
             <div className="file-name-size">
               <div>
-                <p>{file.name}</p>
-                <p>{bytes(file.size)}</p>
+                <p className="filehead">{file.name}</p>
+                <p className="filesize">{bytes(file.size)}</p>
               </div>
               <RxCross2 onClick={() => goBack()} />
             </div>
 
             <div>
               <div className="scrollable-div" onClick={() => copyLink()}>
-                <p style={{ margin: 0 }}>{downloadLink}</p>
+                <p>{downloadLink}</p>
                 <ToastContainer
                   position="top-center"
                   autoClose={2000}
@@ -175,14 +176,17 @@ const DropFileInput = (props) => {
                 />
               </div>
             </div>
-          </div>
+          
 
           <img src={qrCode} alt="QR Code" />
+          
 
           {/* EMAIL */}
+          <Email downloadLink={downloadLink}/>
+          </div>
         </>
       )}
-    </>
+    </div>
   );
 };
 

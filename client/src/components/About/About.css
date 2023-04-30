@@ -1,0 +1,133 @@
+.about {
+    width: 100%;
+    padding: 8rem 0;
+    background-color: #d1d1d13a;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+}
+
+.about .container {
+    padding-inline: 330px !important;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    overflow: hidden;
+}
+
+.about .left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 2rem;
+}
+
+.about .left p {
+    margin: 1.5rem 0;
+}
+
+.about .left .btn {
+    align-self: flex-start;
+}
+
+.about .right {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    padding-inline: 75px;
+}
+
+.about .right .card {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 22px;
+    margin: .4rem;
+    width: 170px;
+    height: 170px;
+    border-radius: 24px;
+    background-color: #fff;
+    border: 1px solid #d3d3d3;
+    box-shadow: rgb(0 0 0 / 12%) 0px 8px 24px;
+    text-align: center;
+    justify-content: center;
+}
+
+.about .right .card:hover {
+    box-shadow: rgb(0 0 0 / 20%) 0px 8px 24px;
+}
+
+.about .card .top {
+    display: flex;
+    flex-direction: column;
+}
+
+.about .right img {
+    width: 50px;
+    margin: auto;
+    padding: .2rem 0;
+}
+
+.about .icon {
+    font-size: 36px;
+    margin: auto;
+    padding-top: 6px;
+    justify-content: center;
+    align-items: center;
+}
+
+.about span {
+    font-size: 22px;
+}
+
+.green {
+    color: var(--primary);
+}
+
+.red {
+    color: #ff0000;
+}
+
+@media screen and (max-width: 940px) {
+    .about .container {
+        grid-template-columns: 1fr;
+    }
+
+    .about .left .btn {
+        align-self: center;
+    }
+
+    .about {
+        min-height: 150rem;
+    }
+
+}
+
+
+@media screen and (max-width: 478px) {
+    .about .container .right .card {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 1650px) {
+    .about .container{
+        padding: 0px !important;
+        padding-left: 30px !important;
+        align-items: center;
+    }
+    .about .right {
+        padding-inline: 0px !important;
+        padding-block: 0px !important;
+    }
+
+    .about {
+        width: 500px;
+        min-height: 0rem;
+        overflow: hidden;
+        background-color: #fff;
+        margin-left: 50px;
+    }
+
+}

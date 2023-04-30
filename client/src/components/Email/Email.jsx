@@ -1,62 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import './email.css'
 
-const Form = ({ downloadLink }) => {
-  const [senderEmail, setSenderEmail] = useState('');
-  const [receiverEmail, setReceiverEmail] = useState('');
+const Email = ({ downloadLink }) => {
+  const [emailTo, setEmailTo] = useState("");
+  const [emailFrom, setEmailFrom] = useState("");
+  const [buttonText, setButtonText] = useState("Send Email")
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const validateEmail = (email) => {
+    // regex pattern for email validation
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  }
 
-    const uuid = downloadLink.substring(downloadLink.lastIndexOf('/') + 1);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const data = {
-      uuid: uuid,
-      senderEmail: senderEmail,
-      receiverEmail: receiverEmail,
-    };
-
-    try {
-      const response = await fetch('https://qrush-backend.onrender.com/api/files', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+    if (!validateEmail(emailTo) || !validateEmail(emailFrom)) {
+      toast.error("Please enter valid email addresses", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
       });
+      return;
+    }
 
-      if (response.ok) {
-        console.log('Success');
-      } else {
-        console.log('Error');
+    setButtonText('Sending...')
+    const uuid = downloadLink.split("/").pop();
+    const data = { uuid, emailTo, emailFrom };
+    try {
+      const response = await axios.post(
+        "https://qrush-backend.onrender.com/api/files/send",
+        data
+      );
+      if (response.data.success) {
+        toast.info("Email sent successfully!", {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setButtonText('Send Email')
+      }
+      else{
+        toast.info("Email already sent", {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setButtonText('Send Email')
       }
     } catch (error) {
-      console.log('Error:', error);
+      console.warn(error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="senderEmail">Sender Email:</label>
+      <label>
         <input
+          className="css-input"
           type="email"
-          id="senderEmail"
-          value={senderEmail}
-          onChange={(event) => setSenderEmail(event.target.value)}
+          placeholder="Sender"
+          value={emailTo}
+          onChange={(e) => setEmailTo(e.target.value)}
         />
-      </div>
-      <div>
-        <label htmlFor="receiverEmail">Receiver Email:</label>
+      </label>
+      <br />
+      <label>
         <input
+          className="css-input"
           type="email"
-          id="receiverEmail"
-          value={receiverEmail}
-          onChange={(event) => setReceiverEmail(event.target.value)}
+          placeholder="Receiver"
+          value={emailFrom}
+          onChange={(e) => setEmailFrom(e.target.value)}
         />
-      </div>
-      <button type="submit">Submit</button>
+      </label>
+      <br />
+      <button type="submit" className="btn-blue">{buttonText}</button>
     </form>
+
   );
 };
 
-export default Form;
+export default Email;

@@ -1,10 +1,19 @@
-.header{
+.header-heading{
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-bottom: 30px;
 }
 ::-webkit-scrollbar {
     display: none;
+}
+.filehead{
+    font-size: larger;
+    font-weight: 800;
+}
+.filesize{
+    font-size:medium;
+    padding-bottom: 10px;
 }
 
 .scrollable-div {
@@ -28,7 +37,7 @@
 
 .drop-file-input {
     width: 400px;
-    height: 200px;
+    height: 300px;
     border: 2px dashed var(--border-color);
     border-radius: 20px;
     position: relative;
@@ -115,7 +124,7 @@
     margin: 1rem;
     color: #ffffff;
     font-size:19px;
-    background: #2bbbfa;
+    background: #6aa3ff;
     padding: 10px 20px 10px 20px;
     text-decoration: none;
   }
